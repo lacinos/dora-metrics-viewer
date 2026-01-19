@@ -38,20 +38,20 @@ This plan follows the strict Hexagonal Architecture and TDD principles outlined 
 
 ## Phase 2: Domain Layer (The Core Logic)
 
-- [ ] **2.1. Domain Entities (Pure Java)**
-  - [ ] Create `Deployment.java` record in the `domain` package.
-  - [ ] Create `Change.java` record in the `domain` package.
-  - [ ] Create `Incident.java` record in the `domain` package.
-  - [ ] **Rule:** These classes must be pure Java objects with no Spring or JPA annotations.
+- [x] **2.1. Domain Entities (Pure Java)**
+  - [x] Create `Deployment.java` record in the `domain` package.
+  - [x] Create `Change.java` record in the `domain` package.
+  - [x] Create `Incident.java` record in the `domain` package.
+  - [x] **Rule:** These classes must be pure Java objects with no Spring or JPA annotations.
 
-- [ ] **2.2. Domain Ports (Interfaces)**
-  - [ ] Create `SourceControlPort.java` interface in the `domain` package.
-    - `findCommits(repoUrl, timeWindow)`
-    - `findPullRequests(repoUrl, timeWindow)`
-    - `findReleases(repoUrl, timeWindow)`
-  - [ ] Create `MetricsRepositoryPort.java` interface in the `domain` package.
-    - `save(Deployment d)`
-    - `getDeployments(repoUrl, timeWindow)`
+- [x] **2.2. Domain Ports (Interfaces)**
+  - [x] Create `SourceControlPort.java` interface in the `domain` package.
+    - `fetchDeployments(repoUrl, timeWindow)`
+    - `fetchChanges(repoUrl, timeWindow)`
+    - `fetchIncidents(repoUrl, timeWindow)`
+  - [x] Create `MetricsRepositoryPort.java` interface in the `domain` package.
+    - `saveDeployment(Deployment d)`, `saveChange`, `saveIncident`
+    - `findDeployments`, `findChanges`, `findIncidents`
 
 - [ ] **2.3. TDD Setup: Lead Time Calculator**
   - [ ] **Write Failing Tests First:**

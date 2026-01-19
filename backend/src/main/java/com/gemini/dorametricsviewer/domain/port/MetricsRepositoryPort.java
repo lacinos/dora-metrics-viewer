@@ -1,0 +1,19 @@
+package com.gemini.dorametricsviewer.domain.port;
+
+import com.gemini.dorametricsviewer.domain.model.Change;
+import com.gemini.dorametricsviewer.domain.model.Deployment;
+import com.gemini.dorametricsviewer.domain.model.Incident;
+
+import java.time.Instant;
+import java.util.List;
+
+public interface MetricsRepositoryPort {
+    void saveDeployment(Deployment deployment);
+    List<Deployment> findDeployments(String repoUrl, Instant since);
+
+    void saveChange(Change change);
+    List<Change> findChanges(String repoUrl, Instant since);
+
+    void saveIncident(Incident incident);
+    List<Incident> findIncidents(String repoUrl, Instant since);
+}
