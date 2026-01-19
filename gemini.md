@@ -117,3 +117,12 @@ When I say "Checkpoint", you should:
 2.  Run `git add .` (or specific files).
 3.  Generate a conventional commit message describing the work done.
 4.  Execute `git commit -m "..."`.
+
+### Branching & Merging Strategy
+- **Role Definition:** You are the Contributor. I am the Maintainer.
+- **Your Boundary:** You work ON branches. You push TO branches. You NEVER merge into `main`.
+- **Definition of Done:** A feature is "Done" when:
+    1. Tests pass.
+    2. Code is committed.
+    3. Branch is pushed to `origin`.
+    4. You inform me: "Branch `feat/xyz` is pushed and ready for review."
