@@ -90,3 +90,30 @@ The system maps GitHub concepts to DORA entities as follows:
 2.  **Verify Imports:** If you are unsure about an import path, use the LSP to resolve the symbol.
 3.  **Refactoring:** When asked to refactor, use the LSP `find_references` tool first to ensure you don't break consumers of that class.
 4.  **Diagnostics:** If a user reports a compile error, use the LSP `get_diagnostics` tool to see exactly what the Java compiler is complaining about.
+
+## 9. Version Control & Git Strategy
+**You have permission to run `git` commands when explicitly asked.**
+
+### Rules of Engagement
+1.  **Zero Broken Commits:** NEVER commit code that does not compile.
+2.  **Atomic Commits:** Do not combine refactors, features, and bug fixes in one commit. Split them.
+3.  **Branching:**
+    - Assume you are already on the correct feature branch.
+    - DO NOT switch branches unless explicitly instructed.
+    - DO NOT push to `main` or `master`.
+
+### Commit Message Standard (Conventional Commits)
+Format: `<type>(<scope>): <description>`
+
+- **feat**: New feature (e.g., `feat(parser): add github release parsing`)
+- **fix**: Bug fix (e.g., `fix(api): handle 404 from github`)
+- **refactor**: Code change that neither fixes a bug nor adds a feature
+- **test**: Adding missing tests or correcting existing tests
+- **chore**: Changes to the build process or auxiliary tools (e.g., `chore(pom): update spring version`)
+
+### Example Workflow
+When I say "Checkpoint", you should:
+1.  Run `git status` to see changes.
+2.  Run `git add .` (or specific files).
+3.  Generate a conventional commit message describing the work done.
+4.  Execute `git commit -m "..."`.
