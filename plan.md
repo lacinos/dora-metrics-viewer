@@ -53,14 +53,14 @@ This plan follows the strict Hexagonal Architecture and TDD principles outlined 
     - `saveDeployment(Deployment d)`, `saveChange`, `saveIncident`
     - `findDeployments`, `findChanges`, `findIncidents`
 
-- [ ] **2.3. TDD Setup: Lead Time Calculator**
-  - [ ] **Write Failing Tests First:**
-    - [ ] Create `LeadTimeCalculatorTest.java` in `src/test/java/.../domain`.
-    - [ ] Write a test method: `givenCommitsAndDeployments_whenCalculateLeadTime_thenReturnsCorrectAverage()`.
-    - [ ] This test will not compile yet, as `LeadTimeCalculator` does not exist.
-  - [ ] **Create Domain Service:**
-    - [ ] Create the `LeadTimeCalculator.java` class in the `domain` package.
-    - [ ] Implement the `calculate` method to make the test pass.
+- [x] **2.3. TDD Setup: Lead Time Calculator**
+  - [x] **Write Failing Tests First:**
+    - [x] Create `LeadTimeCalculatorTest.java` in `src/test/java/.../domain`.
+    - [x] Write a test method: `givenCommitsAndDeployments_whenCalculateLeadTime_thenReturnsCorrectAverage()`.
+    - [x] This test will not compile yet, as `LeadTimeCalculator` does not exist.
+  - [x] **Create Domain Service:**
+    - [x] Create the `LeadTimeCalculator.java` class in the `domain` package.
+    - [x] Implement the `calculate` method to make the test pass.
 
 ## Phase 3: Infrastructure Layer (Adapters)
 
