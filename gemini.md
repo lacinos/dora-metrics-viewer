@@ -84,6 +84,7 @@ The system maps GitHub concepts to DORA entities as follows:
 
 ## 8. Tool Usage & Intelligence (MCP)
 **You have access to an LSP Bridge (Language Server Protocol) via MCP.**
+description: here you have the complete tool reference @tools-reference.md
 
 ### Rules for using LSP:
 1.  **Stop Hallucinating Methods:** Before you use a method from a class you didn't just write, use the LSP tool (e.g., `read_symbol` or `go_to_definition`) to check the actual method signature.
