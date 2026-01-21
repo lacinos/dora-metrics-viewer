@@ -64,11 +64,17 @@ This plan follows the strict Hexagonal Architecture and TDD principles outlined 
 
 ## Phase 3: Infrastructure Layer (Adapters)
 
-- [ ] **3.1. Persistence Adapter (JPA)**
-  - [ ] Create a `JpaDeploymentEntity.java` in `infrastructure/persistence`.
-  - [ ] Create a `DeploymentMapper` to map between `domain.Deployment` and `JpaDeploymentEntity`.
-  - [ ] Create a `SpringDataDeploymentRepository` interface extending `JpaRepository`.
-  - [ ] Create `MetricsRepositoryAdapter` that implements `MetricsRepositoryPort` and uses the Spring Data repository.
+- [x] **3.1. Persistence Adapter (JPA)**
+  - [x] Create JPA Entities in `infrastructure/persistence/entity`:
+    - [x] `JpaDeploymentEntity.java`
+    - [x] `JpaChangeEntity.java`
+    - [x] `JpaIncidentEntity.java`
+  - [x] Create a `MetricsMapper` to map between domain records (`Deployment`, `Change`, `Incident`) and JPA Entities.
+  - [x] Create Spring Data Repositories in `infrastructure/persistence/repository`:
+    - [x] `SpringDataDeploymentRepository`
+    - [x] `SpringDataChangeRepository`
+    - [x] `SpringDataIncidentRepository`
+  - [x] Create `MetricsRepositoryAdapter` that implements `MetricsRepositoryPort` and uses the Spring Data repositories.
 
 - [ ] **3.2. Source Control Adapter (GitHub)**
   - [ ] Create a `GitHubAdapter` in `infrastructure/github` that implements `SourceControlPort`.
