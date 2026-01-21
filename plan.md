@@ -96,11 +96,11 @@ This plan follows the strict Hexagonal Architecture and TDD principles outlined 
 
 ## Phase 5: Frontend Visualization
 
-- [ ] **5.1. Data Models & Service**
-  - [ ] Create TypeScript interfaces for the API DTOs.
-  - [ ] Create an `ApiService` to fetch the metrics from the backend.
+- [x] **5.1. Data Models - [ ] **5.1. Data Models & Service** Service**
+  - [x] Create TypeScript interfaces for the API DTOs.
+  - [x] Create an `ApiService` to fetch the metrics from the backend.
 
-- [ ] **5.2. Metrics Dashboard Component**
-  - [ ] Create a `DashboardComponent`.
-  - [ ] Add a form to input the GitHub repository URL.
-  - [ ] On submit, call the `ApiService`.
+- [x] **5.2. Metrics Dashboard Component**
+  - [x] Create a `DashboardComponent`.
+  - [x] Add a form to input the GitHub repository URL.
+  - [x] On submit, call the `ApiService`.
