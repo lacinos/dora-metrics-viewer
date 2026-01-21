@@ -76,10 +76,10 @@ This plan follows the strict Hexagonal Architecture and TDD principles outlined 
     - [x] `SpringDataIncidentRepository`
   - [x] Create `MetricsRepositoryAdapter` that implements `MetricsRepositoryPort` and uses the Spring Data repositories.
 
-- [ ] **3.2. Source Control Adapter (GitHub)**
-  - [ ] Create a `GitHubAdapter` in `infrastructure/github` that implements `SourceControlPort`.
-  - [ ] Use a REST client (e.g., `RestTemplate` or `WebClient`) to call the GitHub API.
-  - [ ] Add configuration for the GitHub token in `application.properties`.
+- [x] **3.2. Source Control Adapter (GitHub)**
+  - [x] Create a `GitHubAdapter` in `infrastructure/github` that implements `SourceControlPort`.
+  - [x] Use a REST client (e.g., `RestTemplate` or `WebClient`) to call the GitHub API.
+  - [x] Add configuration for the GitHub token in `application.properties`.
 
 ## Phase 4: Application Layer & API
 
