@@ -24,8 +24,10 @@ public class MetricsRepositoryAdapter implements MetricsRepositoryPort {
     private final MetricsMapper mapper;
 
     @Override
-    public void saveDeployment(Deployment deployment) {
-        deploymentRepository.save(mapper.toEntity(deployment));
+    public void saveDeployments(List<Deployment> deployments) {
+        deploymentRepository.saveAll(deployments.stream()
+            .map(mapper::toEntity)
+            .toList());
     }
 
     @Override
@@ -37,8 +39,10 @@ public class MetricsRepositoryAdapter implements MetricsRepositoryPort {
     }
 
     @Override
-    public void saveChange(Change change) {
-        changeRepository.save(mapper.toEntity(change));
+    public void saveChanges(List<Change> changes) {
+        changeRepository.saveAll(changes.stream()
+            .map(mapper::toEntity)
+            .toList());
     }
 
     @Override
@@ -50,8 +54,10 @@ public class MetricsRepositoryAdapter implements MetricsRepositoryPort {
     }
 
     @Override
-    public void saveIncident(Incident incident) {
-        incidentRepository.save(mapper.toEntity(incident));
+    public void saveIncidents(List<Incident> incidents) {
+        incidentRepository.saveAll(incidents.stream()
+            .map(mapper::toEntity)
+            .toList());
     }
 
     @Override

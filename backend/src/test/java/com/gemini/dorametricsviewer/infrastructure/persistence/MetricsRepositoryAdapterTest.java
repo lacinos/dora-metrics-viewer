@@ -40,7 +40,7 @@ class MetricsRepositoryAdapterTest {
         );
 
         // When
-        adapter.saveDeployment(deployment);
+        adapter.saveDeployments(List.of(deployment));
         List<Deployment> results = adapter.findDeployments("http://repo.com", now.minusSeconds(60));
 
         // Then
