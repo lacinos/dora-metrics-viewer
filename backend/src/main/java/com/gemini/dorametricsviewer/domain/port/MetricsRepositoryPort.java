@@ -8,12 +8,12 @@ import java.time.Instant;
 import java.util.List;
 
 public interface MetricsRepositoryPort {
-    void saveDeployment(Deployment deployment);
+    void saveDeployments(List<Deployment> deployments);
     List<Deployment> findDeployments(String repoUrl, Instant since);
 
-    void saveChange(Change change);
+    void saveChanges(List<Change> changes);
     List<Change> findChanges(String repoUrl, Instant since);
 
-    void saveIncident(Incident incident);
+    void saveIncidents(List<Incident> incidents);
     List<Incident> findIncidents(String repoUrl, Instant since);
 }

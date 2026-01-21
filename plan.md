@@ -83,10 +83,10 @@ This plan follows the strict Hexagonal Architecture and TDD principles outlined 
 
 ## Phase 4: Application Layer & API
 
-- [ ] **4.1. Application Service (Orchestration)**
-  - [ ] Create `DoraMetricsService.java` in the `application` package.
-  - [ ] This service will use the ports (`SourceControlPort`, `MetricsRepositoryPort`) and the domain services (`LeadTimeCalculator`).
-  - [ ] Method: `calculateMetrics(repoUrl, timeWindow)` which fetches data, calculates metrics, and saves/returns results.
+- [x] **4.1. Application Service (Orchestration)**
+  - [x] Create `DoraMetricsService.java` in the `application` package.
+  - [x] This service will use the ports (`SourceControlPort`, `MetricsRepositoryPort`) and the domain services (`LeadTimeCalculator`).
+  - [x] Method: `calculateMetrics(repoUrl, timeWindow)` which fetches data, calculates metrics, and saves/returns results.
 
 - [ ] **4.2. Web Adapter (REST Controller)**
   - [ ] Create `DoraMetricsController.java` in `infrastructure/web`.
