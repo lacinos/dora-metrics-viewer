@@ -88,11 +88,11 @@ This plan follows the strict Hexagonal Architecture and TDD principles outlined 
   - [x] This service will use the ports (`SourceControlPort`, `MetricsRepositoryPort`) and the domain services (`LeadTimeCalculator`).
   - [x] Method: `calculateMetrics(repoUrl, timeWindow)` which fetches data, calculates metrics, and saves/returns results.
 
-- [ ] **4.2. Web Adapter (REST Controller)**
-  - [ ] Create `DoraMetricsController.java` in `infrastructure/web`.
-  - [ ] Expose a POST endpoint `/api/metrics` that takes a repository URL.
-  - [ ] Use `DoraMetricsService` to get the calculated metrics.
-  - [ ] Return the metrics as a DTO.
+- [x] **4.2. Web Adapter (REST Controller)**
+  - [x] Create `DoraMetricsController.java` in `infrastructure/web`.
+  - [x] Expose a POST endpoint `/api/metrics` that takes a repository URL.
+  - [x] Use `DoraMetricsService` to get the calculated metrics.
+  - [x] Return the metrics as a DTO.
 
 ## Phase 5: Frontend Visualization
 
