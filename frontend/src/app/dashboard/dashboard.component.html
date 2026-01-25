@@ -1,0 +1,91 @@
+<div class="min-h-screen bg-gray-100 p-8">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <header class="mb-8 text-center">
+      <h1 class="text-3xl font-bold text-gray-800">DORA Metrics Viewer</h1>
+      <p class="text-gray-600 mt-2">Analyze your repository performance</p>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <div class="flex gap-4">
+        <input 
+          type="text" 
+          [ngModel]="repoUrl()" 
+          (ngModelChange)="repoUrl.set($event)"
+          placeholder="Enter GitHub Repository URL (e.g., https://github.com/owner/repo)" 
+          class="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          [disabled]="isLoading()"
+        />
+        <button 
+          (click)="onScan()" 
+          [disabled]="isLoading() || !repoUrl()"
+          class="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          <span *ngIf="isLoading()">Scanning...</span>
+          <span *ngIf="!isLoading()">Scan</span>
+        </button>
+      </div>
+      <div *ngIf="error()" class="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
+        {{ error() }}
+      </div>
+    </div>
+
+    <!-- Metrics Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      
+      <!-- Deployment Frequency -->
+      <div class="bg-white rounded-lg shadow-md p-6 h-[400px]">
+        <h2 class="text-xl font-semibold mb-4 text-gray-700">Deployment Frequency</h2>
+        <div class="h-[300px]">
+           <ngx-charts-bar-vertical
+            [results]="deploymentFrequencyData()"
+            [xAxis]="true"
+            [yAxis]="true"
+            [showXAxisLabel]="true"
+            [showYAxisLabel]="true"
+            [xAxisLabel]="'Day'"
+            [yAxisLabel]="'Deployments'"
+            [scheme]="blueScheme">
+          </ngx-charts-bar-vertical>
+        </div>
+      </div>
+
+      <!-- Lead Time for Changes -->
+      <div class="bg-white rounded-lg shadow-md p-6 h-[400px]">
+        <h2 class="text-xl font-semibold mb-4 text-gray-700">Lead Time for Changes</h2>
+        <div class="h-[300px] flex justify-center items-center">
+          <ngx-charts-number-card
+            [results]="leadTimeData()"
+            [scheme]="greenScheme"
+            cardColor="#f3f4f6">
+          </ngx-charts-number-card>
+        </div>
+      </div>
+
+      <!-- Change Failure Rate -->
+      <div class="bg-white rounded-lg shadow-md p-6 h-[400px]">
+        <h2 class="text-xl font-semibold mb-4 text-gray-700">Change Failure Rate</h2>
+         <div class="h-[300px]">
+          <ngx-charts-advanced-pie-chart
+            [results]="changeFailureRateData()"
+            [scheme]="mixedScheme">
+          </ngx-charts-advanced-pie-chart>
+        </div>
+      </div>
+
+      <!-- Time to Restore Service -->
+      <div class="bg-white rounded-lg shadow-md p-6 h-[400px]">
+        <h2 class="text-xl font-semibold mb-4 text-gray-700">Time to Restore Service</h2>
+        <div class="h-[300px] flex justify-center items-center">
+           <ngx-charts-number-card
+            [results]="timeToRestoreData()"
+            [scheme]="amberScheme"
+             cardColor="#f3f4f6">
+          </ngx-charts-number-card>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
