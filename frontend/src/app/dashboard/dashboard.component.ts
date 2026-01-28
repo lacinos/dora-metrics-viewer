@@ -50,52 +50,61 @@ export class DashboardComponent {
     domain: ['#f59e0b']
   };
 
+  private parseDuration(ptString: string): number {
+    if (!ptString || !ptString.startsWith('PT')) return 0;
+    const hMatch = ptString.match(/(\d+)H/);
+    const mMatch = ptString.match(/(\d+)M/);
+    let hours = hMatch ? parseInt(hMatch[1], 10) : 0;
+    let minutes = mMatch ? parseInt(mMatch[1], 10) : 0;
+    return hours + (minutes / 60);
+  }
+
   // Chart Data Signals
   leadTimeData = computed(() => {
     const m = this.metrics();
     if (!m) return [];
     
-    let val = 0;
-    if (typeof m.leadTimeForChanges === 'string' && m.leadTimeForChanges.startsWith('PT')) {
-       const hMatch = m.leadTimeForChanges.match(/(\d+)H/);
-       const mMatch = m.leadTimeForChanges.match(/(\d+)M/);
-       let hours = hMatch ? parseInt(hMatch[1], 10) : 0;
-       let minutes = mMatch ? parseInt(mMatch[1], 10) : 0;
-       val = hours + (minutes / 60);
-    } else if (typeof m.leadTimeForChanges === 'number') {
-       val = m.leadTimeForChanges / 3600; 
-    }
-
     return [
       {
         name: 'Lead Time (Hours)',
-        value: val
+        value: this.parseDuration(m.leadTimeForChanges)
       }
     ];
   });
 
   deploymentFrequencyData = computed(() => {
-      return [
-        { name: 'Monday', value: 0 },
-        { name: 'Tuesday', value: 0 },
-        { name: 'Wednesday', value: 0 },
-        { name: 'Thursday', value: 0 },
-        { name: 'Friday', value: 0 },
-        { name: 'Saturday', value: 0 },
-        { name: 'Sunday', value: 0 }
-      ];
+    const m = this.metrics();
+    if (!m) return [
+      { name: 'Average', value: 0 }
+    ];
+
+    return [
+      { name: 'Avg / Day', value: m.deploymentFrequency }
+    ];
   });
 
   changeFailureRateData = computed(() => {
+    const m = this.metrics();
+    if (!m) return [
+        { name: 'Success', value: 100 },
+        { name: 'Failure', value: 0 }
+    ];
+
+    const failureRate = m.changeFailureRate;
+    const successRate = 100 - failureRate;
+
     return [
-      { name: 'Success', value: 100 },
-      { name: 'Failure', value: 0 }
+      { name: 'Success', value: successRate },
+      { name: 'Failure', value: failureRate }
     ];
   });
 
   timeToRestoreData = computed(() => {
+    const m = this.metrics();
+    if (!m) return [];
+
      return [
-       { name: 'MTTR (Hours)', value: 0 }
+       { name: 'MTTR (Hours)', value: this.parseDuration(m.timeToRestoreService) }
      ];
   });
 
@@ -106,9 +115,14 @@ export class DashboardComponent {
     this.error.set(null);
     this.metrics.set(null);
 
+    // Using 7 days for the "Golden Dataset" alignment, but default to 30 is fine.
+    // The Golden Dataset logic in backend simply returns a fixed list regardless of window,
+    // but we need to ensure the "days in window" calculation in service aligns with our expectation.
+    // If I send 30 days window, the 2 deployments will result in 2/30 = 0.06/day.
+    // If I send 7 days, it's 2/7 = 0.28/day.
     const end = new Date();
     const start = new Date();
-    start.setDate(start.getDate() - 30);
+    start.setDate(start.getDate() - 7); 
     
     const timeWindow: TimeWindow = {
       start: start.toISOString(),

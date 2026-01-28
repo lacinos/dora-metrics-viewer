@@ -96,7 +96,7 @@ This plan follows the strict Hexagonal Architecture and TDD principles outlined 
 
 ## Phase 5: Frontend Visualization
 
-- [x] **5.1. Data Models - [ ] **5.1. Data Models & Service** Service**
+- [x] **5.1. Data Models & Service**
   - [x] Create TypeScript interfaces for the API DTOs.
   - [x] Create an `ApiService` to fetch the metrics from the backend.
 
@@ -104,3 +104,22 @@ This plan follows the strict Hexagonal Architecture and TDD principles outlined 
   - [x] Create a `DashboardComponent`.
   - [x] Add a form to input the GitHub repository URL.
   - [x] On submit, call the `ApiService`.
+
+## Phase 6: Completing the Metrics (Current Focus)
+
+- [ ] **6.1. Backend: Implement Remaining Metrics**
+  - [ ] Update `DoraMetricsResult.java` to include:
+    - `deploymentFrequency` (Double - deployments/day)
+    - `changeFailureRate` (Double - percentage)
+    - `timeToRestoreService` (Duration - average time)
+  - [ ] Implement `DeploymentFrequencyCalculator` (or logic in service).
+  - [ ] Implement `ChangeFailureRateCalculator`.
+  - [ ] Implement `TimeToRestoreCalculator`.
+  - [ ] Update `DoraMetricsService` to populate the new fields.
+
+- [ ] **6.2. Frontend: Connect Real Data**
+  - [ ] Update `dora-metrics.model.ts` to match the backend DTO.
+  - [ ] Update `dashboard.component.ts` to replace hardcoded values with calculated data from the API.
+
+- [ ] **6.3. Verification**
+  - [ ] Verify using the "Test Mode" Golden Dataset.

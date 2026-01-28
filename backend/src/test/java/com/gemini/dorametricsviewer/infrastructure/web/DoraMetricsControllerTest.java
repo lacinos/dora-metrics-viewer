@@ -41,7 +41,12 @@ class DoraMetricsControllerTest {
         TimeWindow timeWindow = new TimeWindow(Instant.now().minusSeconds(3600), Instant.now());
         ScanRequest request = new ScanRequest(repoUrl, timeWindow);
 
-        DoraMetricsResult expectedResult = new DoraMetricsResult(Duration.ofHours(2));
+        DoraMetricsResult expectedResult = new DoraMetricsResult(
+            Duration.ofHours(2), 
+            1.5, 
+            20.0, 
+            Duration.ofMinutes(30)
+        );
 
         when(doraMetricsService.calculateMetrics(eq(repoUrl), any(TimeWindow.class)))
                 .thenReturn(expectedResult);
@@ -51,6 +56,8 @@ class DoraMetricsControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.leadTimeForChanges").exists());
+                .andExpect(jsonPath("$.leadTimeForChanges").exists())
+                .andExpect(jsonPath("$.deploymentFrequency").value(1.5))
+                .andExpect(jsonPath("$.changeFailureRate").value(20.0));
     }
 }
