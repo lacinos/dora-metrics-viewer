@@ -107,19 +107,23 @@ This plan follows the strict Hexagonal Architecture and TDD principles outlined 
 
 ## Phase 6: Completing the Metrics (Current Focus)
 
-- [ ] **6.1. Backend: Implement Remaining Metrics**
-  - [ ] Update `DoraMetricsResult.java` to include:
+- [x] **6.1. Backend: Implement Remaining Metrics**
+  - [x] Update `DoraMetricsResult.java` to include:
     - `deploymentFrequency` (Double - deployments/day)
     - `changeFailureRate` (Double - percentage)
     - `timeToRestoreService` (Duration - average time)
-  - [ ] Implement `DeploymentFrequencyCalculator` (or logic in service).
-  - [ ] Implement `ChangeFailureRateCalculator`.
-  - [ ] Implement `TimeToRestoreCalculator`.
-  - [ ] Update `DoraMetricsService` to populate the new fields.
+  - [x] Implement `DeploymentFrequencyCalculator` (Logic in Service).
+  - [x] Implement `ChangeFailureRateCalculator` (Logic in Service).
+  - [x] Implement `TimeToRestoreCalculator` (Logic in Service).
+  - [x] Update `DoraMetricsService` to populate the new fields.
 
-- [ ] **6.2. Frontend: Connect Real Data**
-  - [ ] Update `dora-metrics.model.ts` to match the backend DTO.
-  - [ ] Update `dashboard.component.ts` to replace hardcoded values with calculated data from the API.
+- [x] **6.2. Frontend: Connect Real Data**
+  - [x] Update `dora-metrics.model.ts` to match the backend DTO.
+  - [x] Update `dashboard.component.ts` to replace hardcoded values with calculated data from the API.
 
-- [ ] **6.3. Verification**
-  - [ ] Verify using the "Test Mode" Golden Dataset.
+- [ ] **6.3. Verification & Debugging**
+  - [ ] Verify using the "Test Mode" Golden Dataset (as defined in `testing_strategy.md`).
+  - [x] **Debug Production Data:**
+      - [x] Investigate why `google/guava` returned no data (Hypothesis: Time window or Rate Limit).
+      - [x] **Action:** Test with `microsoft/vscode` (High activity repo).
+        - **Result:** Successfully fetched 1 deployment (freq: 0.14/day). Lead time 0 due to naive matching logic. Backend works.
