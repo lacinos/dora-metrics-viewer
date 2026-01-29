@@ -4,18 +4,7 @@
 
 Node.js version v25.2.0 detected.
 Odd numbered Node.js versions will not enter LTS status and should not be used for production. For more information, please see https://nodejs.org/en/about/previous-releases/.
-Component HMR has been enabled, see https://angular.dev/hmr for more info.
-❯ Building...
-✔ Building...
-Initial chunk files | Names         |  Raw size
-polyfills.js        | polyfills     |  89.77 kB | 
-main.js             | main          |  24.07 kB | 
-styles.css          | styles        |   9.69 kB | 
-
-                    | Initial total | 123.53 kB
-
-Application bundle generation complete. [3.997 seconds]
-
-Watch mode enabled. Watching for file changes...
-NOTE: Raw file sizes do not reflect development server per-request transformations.
-  ➜  Local:   http://localhost:4200/
+ [1mPort 4200 is already in use.
+Would you like to use a different port?[22m [2m(Y/n)[22m[47G
+[?25hAn unhandled exception occurred: Port 4200 is already in use. Use '--port' to specify a different port.
+See "/tmp/ng-y0EIus/angular-errors.log" for further details.
