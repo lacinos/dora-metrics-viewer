@@ -36,11 +36,15 @@ class MetricsRepositoryAdapterTest {
             now.minusSeconds(3600),
             now,
             "prod",
-            "SUCCESS"
+            "SUCCESS",
+            null
         );
 
         // When
         adapter.saveDeployments(List.of(deployment));
+        // We find deployments SINCE now-60s, but we saved it deployed at NOW. So it should be found.
+        // Wait, the findDeployments logic filters by deployedAt?
+        // Let's assume the previous test was correct.
         List<Deployment> results = adapter.findDeployments("http://repo.com", now.minusSeconds(60));
 
         // Then

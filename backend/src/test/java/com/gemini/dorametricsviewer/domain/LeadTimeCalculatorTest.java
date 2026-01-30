@@ -33,7 +33,8 @@ class LeadTimeCalculatorTest {
             deployTime.minusSeconds(60),
             deployTime,
             "prod",
-            "SUCCESS"
+            "SUCCESS",
+            null
         );
 
         LeadTimeCalculator calculator = new LeadTimeCalculator();
