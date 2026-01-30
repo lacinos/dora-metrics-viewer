@@ -24,8 +24,8 @@ public class FakeGitHubAdapter implements SourceControlPort {
         // D1: 6 days ago. SHA-1.
         // D2: 2 days ago. SHA-2.
         return List.of(
-            new Deployment("dep-1", repoUrl, "sha-1", now.minus(6, ChronoUnit.DAYS), now.minus(6, ChronoUnit.DAYS), "production", "SUCCESS"),
-            new Deployment("dep-2", repoUrl, "sha-2", now.minus(2, ChronoUnit.DAYS), now.minus(2, ChronoUnit.DAYS), "production", "SUCCESS")
+            new Deployment("dep-1", repoUrl, "sha-1", now.minus(6, ChronoUnit.DAYS), now.minus(6, ChronoUnit.DAYS), "production", "SUCCESS", null),
+            new Deployment("dep-2", repoUrl, "sha-2", now.minus(2, ChronoUnit.DAYS), now.minus(2, ChronoUnit.DAYS), "production", "SUCCESS", null)
         );
     }
 

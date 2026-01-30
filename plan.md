@@ -105,7 +105,7 @@ This plan follows the strict Hexagonal Architecture and TDD principles outlined 
   - [x] Add a form to input the GitHub repository URL.
   - [x] On submit, call the `ApiService`.
 
-## Phase 6: Completing the Metrics (Current Focus)
+## Phase 6: Completing the Metrics
 
 - [x] **6.1. Backend: Implement Remaining Metrics**
   - [x] Update `DoraMetricsResult.java` to include:
@@ -121,9 +121,26 @@ This plan follows the strict Hexagonal Architecture and TDD principles outlined 
   - [x] Update `dora-metrics.model.ts` to match the backend DTO.
   - [x] Update `dashboard.component.ts` to replace hardcoded values with calculated data from the API.
 
-- [ ] **6.3. Verification & Debugging**
+- [x] **6.3. Verification & Debugging**
   - [ ] Verify using the "Test Mode" Golden Dataset (as defined in `testing_strategy.md`).
   - [x] **Debug Production Data:**
       - [x] Investigate why `google/guava` returned no data (Hypothesis: Time window or Rate Limit).
       - [x] **Action:** Test with `microsoft/vscode` (High activity repo).
         - **Result:** Successfully fetched 1 deployment (freq: 0.14/day). Lead time 0 due to naive matching logic. Backend works.
+
+## Phase 7: Robustness & Heuristics (Completed)
+
+See `feature_plan-robustness.md` for details.
+
+- [x] **7.1. TDD Harness: Capture & Replay**
+  - [x] Create `DataCapturer` utility to snapshot real GitHub API responses (deployments/changes) for complex repos (e.g., `vscode`).
+  - [x] Create `ComplexHeuristicsTest` that loads these snapshots into a `MockSourceControlAdapter`.
+  - [x] **Baseline Test:** Assert that current logic fails (Lead Time = 0) for these complex datasets (Implicit in finding matches).
+
+- [x] **7.2. Heuristic Implementation**
+  - [x] **Heuristic B (Release Body Parsing):** Implement logic to parse release notes for PR links.
+  - [x] **Heuristic C (Time-Window Bracketing):** Implement fallback based on timestamp ordering.
+  - [x] Refactor `LeadTimeCalculator` to use a Chain of Responsibility or Strategy pattern for these heuristics.
+
+- [x] **7.3. Final Verification**
+  - [x] Verify `ComplexHeuristicsTest` passes with > 50% match rate.

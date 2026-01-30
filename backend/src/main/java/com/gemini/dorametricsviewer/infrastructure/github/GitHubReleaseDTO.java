@@ -9,5 +9,6 @@ record GitHubReleaseDTO(
     @JsonProperty("target_commitish") String targetCommitish,
     @JsonProperty("created_at") Instant createdAt,
     @JsonProperty("published_at") Instant publishedAt,
-    @JsonProperty("html_url") String htmlUrl
+    @JsonProperty("html_url") String htmlUrl,
+    String body
 ) {}

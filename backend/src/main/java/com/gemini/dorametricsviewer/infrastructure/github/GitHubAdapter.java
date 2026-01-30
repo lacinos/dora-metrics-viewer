@@ -47,7 +47,8 @@ public class GitHubAdapter implements SourceControlPort {
                         r.createdAt(),
                         r.publishedAt(),
                         "production",
-                        "SUCCESS"
+                        "SUCCESS",
+                        r.body()
                 ))
                 .collect(Collectors.toList());
     }

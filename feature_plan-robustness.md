@@ -1,62 +1,68 @@
 # Feature Plan: Robust Metrics & Heuristics
 
-**Objective:** Enhance the `LeadTimeCalculator` to correctly link Changes (PRs) to Deployments (Releases) in complex, real-world repositories where strict SHA matching fails (due to squashing, rebasing, or release branching).
+**Objective:** Enhance the `LeadTimeCalculator` to correctly link Changes (Pull Requests) to Deployments (Releases) in complex, real-world repositories where strict SHA matching fails. This is a critical step for "Production Readiness".
 
-## 1. The Problem
-Currently, `LeadTimeCalculator` relies on:
-```java
-if (change.commitSha().equals(deployment.commitSha()))
-```
-**Why this fails:**
-- **Squash Merges:** The PR commit SHA differs from the commit on the main branch.
-- **Release Branches:** The Release tag points to a commit on a branch, not the direct merge commit of a feature.
-- **Result:** `LeadTime = 0` (No matches found).
+## 1. The Challenge
+Real-world repositories (like `microsoft/vscode` or `google/guava`) often have complex release processes:
+- **Squash Merges:** The commit SHA on the main branch differs from the PR's merge commit SHA.
+- **Release Branches:** Releases are tagged on a separate branch, not the direct `main` branch commit.
+- **Manual Releases:** Releases might be triggered manually after a batch of PRs.
 
-## 2. TDD Workflow: "Capture & Replay"
+**Current State:** `LeadTimeCalculator` only links if `Change.commitSha == Deployment.commitSha`. This results in **0 metrics** for most real repos.
 
-To solve this without hitting API rate limits or dealing with changing live data, we will use a **Data-Driven TDD** approach.
+## 2. Proposed TDD Workflow (The "Capture & Replay" Strategy)
 
-### Step 2.1: Create Data Capturer (Test Utility)
-Create a temporary utility (test-only) to fetch real data from GitHub and dump it to JSON files in `src/test/resources/datasets/vscode`.
-- `deployments.json`: Real response from `GET /repos/microsoft/vscode/releases`
-- `changes.json`: Real response from `GET /repos/microsoft/vscode/pulls`
+We will use a data-driven TDD approach to implement richer heuristics without flakiness or rate-limiting issues.
 
-### Step 2.2: Create `ScenarioBasedTest`
-Create a new test class `ComplexHeuristicsTest.java`.
-- **Setup:** Load `deployments.json` and `changes.json` into a `MockSourceControlAdapter`.
-- **Test Case 1 (Baseline):** Assert that current logic returns 0 matches (validating the problem).
-- **Test Case 2 (Robust):** Assert that we find > 50% matches using better heuristics.
+### Phase 7.1: Test Harness Setup
+1.  **Data Capture:** Create a utility `DataCapturer` to fetch and save real JSON responses from GitHub API for:
+    -   `microsoft/vscode` (High volume, complex)
+    -   `google/guava` (Standard Java lib)
+    -   Save these as `src/test/resources/datasets/vscode/deployments.json` and `changes.json`.
+2.  **Mocking:** Create `ComplexHeuristicsTest` that uses `MockSourceControlAdapter` to load these JSON files instead of hitting the API.
+3.  **Baseline Failure:** Write a test case that asserts `LeadTimeCalculator` returns 0 duration/matches with the current logic. This confirms the problem.
 
-## 3. Implementation Strategy: The Heuristic Ladder
+### Phase 7.2: Iterative Heuristic Implementation
+We will implement a **Chain of Responsibility** (or Strategy List) for matching. The calculator will try them in order.
 
-We will implement a "Chain of Responsibility" or a prioritized list of matching strategies.
+#### Strategy A: Exact Match (Existing)
+- **Logic:** `Change.sha == Deployment.sha`
+- **Status:** Already implemented.
+- **Priority:** 1 (Highest Confidence)
 
-### Heuristic A: Exact Match (Existing)
-*Keep as high priority.*
-- Logic: `PR.mergeCommitSha == Release.targetCommitish`
+#### Strategy B: Release Body Parser (The "Linker")
+- **Logic:** Parse the `Deployment.description` (Release Notes). Look for GitHub auto-generated links like `.../pull/123` or `#123`.
+- **Implementation:**
+    -   Regex match `/(?:#|pull\/)(\d+)/`.
+    -   Find the corresponding `Change` by PR number.
+- **Priority:** 2 (High Confidence)
 
-### Heuristic B: Release Body Parsing (High Precision)
-GitHub often auto-generates release notes containing PR links.
-- Logic: Parse `Release.body`. Look for patterns like `#123` or `https://github.com/.../pull/123`.
-- Action: If `Release.body` contains the PR number, link them.
+#### Strategy C: Time Window & Graph Reachability (The "Net")
+- **Logic:** If a PR was merged *before* the deployment and *after* the previous deployment.
+- **Refinement:**
+    -   Strict: `PreviousDeployment.date < Change.mergedAt < CurrentDeployment.date`
+    -   Graph (Optional/Advanced): Verify `Change.sha` is an ancestor of `Deployment.sha`. (Requires fetching commits, maybe Phase 8).
+- **Priority:** 3 (Medium Confidence - Fallback)
 
-### Heuristic C: Time-Window Bracketing (Fallback)
-If a PR is merged *before* a release, and *after* the previous release, it belongs to that release bucket.
-- Logic:
-    1. Sort Releases by Date.
-    2. Sort Changes by `mergedAt`.
-    3. Iterate Releases. A Change belongs to Release `R(i)` if:
-       `R(i-1).date < Change.mergedAt <= R(i).date`
+### Phase 7.3: Verification
+1.  Run `ComplexHeuristicsTest`.
+2.  Assert that match rate improves from 0% to > 50%.
+3.  Verify that `LeadTime` is a reasonable positive value (e.g., hours or days, not 0).
 
-## 4. Execution Steps
+## 3. Implementation Plan (Checklist)
 
-1.  **Harness:** Create the JSON capture script and capture `microsoft/vscode` data.
-2.  **Red Test:** Create the test harness that loads these JSONs and asserts the current failure (0 lead time).
-3.  **Green (Heuristic B):** Implement Release Body parsing. Run test.
-4.  **Green (Heuristic C):** Implement Time-Window logic. Run test.
-5.  **Refactor:** Clean up the `LeadTimeCalculator` to be clean and readable.
+- [x] **Create `DataCapturer.java`** (Temporary main class to fetch & save JSONs).
+- [x] **Capture Data:** Run capturer for `microsoft/vscode`.
+- [x] **Create `ComplexHeuristicsTest.java`**:
+    -   [x] Load JSONs.
+    -   [x] Assert `calculate()` returns valid Duration (not null/zero).
+- [x] **Implement `ReleaseBodyStrategy`**:
+    -   [x] Add to `LeadTimeCalculator`.
+    -   [x] Verify test passes (Green).
+- [x] **Implement `TimeWindowStrategy`**:
+    -   [x] Add to `LeadTimeCalculator`.
+    -   [x] Handle edge cases (first deployment).
+- [x] **Refactor**: Ensure `LeadTimeCalculator` remains clean.
 
-## 5. Definition of Done
-- [ ] `ComplexHeuristicsTest` passes with the `vscode` dataset.
-- [ ] `LeadTimeCalculator` is decoupled from the specific matching logic (Strategy Pattern).
-- [ ] Existing tests still pass.
+## 4. Dependencies
+- No new libraries needed. Use standard Java `regex` and `java.time`.

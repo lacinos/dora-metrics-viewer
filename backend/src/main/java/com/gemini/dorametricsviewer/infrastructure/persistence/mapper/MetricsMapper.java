@@ -20,7 +20,8 @@ public class MetricsMapper {
             domain.createdAt(),
             domain.deployedAt(),
             domain.environment(),
-            domain.status()
+            domain.status(),
+            domain.description()
         );
     }
 
@@ -33,7 +34,8 @@ public class MetricsMapper {
             entity.getCreatedAt(),
             entity.getDeployedAt(),
             entity.getEnvironment(),
-            entity.getStatus()
+            entity.getStatus(),
+            entity.getDescription()
         );
     }
 

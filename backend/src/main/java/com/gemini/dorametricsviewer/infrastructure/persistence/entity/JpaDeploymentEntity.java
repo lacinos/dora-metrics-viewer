@@ -2,6 +2,7 @@ package com.gemini.dorametricsviewer.infrastructure.persistence.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,4 +24,7 @@ public class JpaDeploymentEntity {
     private Instant deployedAt;
     private String environment;
     private String status;
+    
+    @Lob
+    private String description;
 }

@@ -9,5 +9,6 @@ public record Deployment(
     Instant createdAt,
     Instant deployedAt,
     String environment,
-    String status
+    String status,
+    String description
 ) {}
