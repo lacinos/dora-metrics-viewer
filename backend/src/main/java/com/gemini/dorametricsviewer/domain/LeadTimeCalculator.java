@@ -16,31 +16,23 @@ public class LeadTimeCalculator {
     );
 
     public Duration calculate(List<Change> changes, List<Deployment> deployments) {
-        List<Duration> leadTimes = changes.stream()
-            .map(change -> findDeploymentFor(change, deployments))
-            .filter(Optional::isPresent)
-            .map(opt -> {
-                 // Calculate Lead Time: from code commit (creation) to deployment
-                 // If deployment happened before creation (impossible theoretical, but possible with bad data/time window), we take absolute or 0?
-                 // Duration.between handles negatives, but we usually want positive.
-                 // We trust the strategies to return valid deployments (after merge).
-                 // Note: We need the change object here too.
-                 // Refactoring the stream map to return a Pair or process inside.
-                 return Duration.ZERO; // Placeholder to fix compilation structure below
-            })
-            .toList();
-            
-        // Correct logic:
+        System.out.println("DEBUG: Calculating Lead Time for " + changes.size() + " changes and " + deployments.size() + " deployments");
+        
         List<Duration> validLeadTimes = changes.stream()
             .map(change -> {
                 Optional<Deployment> match = findDeploymentFor(change, deployments);
-                if (match.isEmpty()) return null;
+                if (match.isEmpty()) {
+                    System.out.println("DEBUG: No match found for change " + change.id());
+                    return null;
+                }
+                System.out.println("DEBUG: Match found! Change " + change.id() + " -> Deployment " + match.get().id());
                 return Duration.between(change.createdAt(), match.get().deployedAt());
             })
             .filter(d -> d != null)
             .toList();
 
         if (validLeadTimes.isEmpty()) {
+            System.out.println("DEBUG: No valid lead times calculated.");
             return Duration.ZERO;
         }
 
@@ -56,6 +48,7 @@ public class LeadTimeCalculator {
         for (MatchStrategy strategy : strategies) {
             Optional<Deployment> match = strategy.findDeployment(change, deployments);
             if (match.isPresent()) {
+                System.out.println("DEBUG: Strategy " + strategy.getClass().getSimpleName() + " matched.");
                 return match;
             }
         }

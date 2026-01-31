@@ -72,7 +72,7 @@ class GitHubAdapterTest {
             ]
             """;
 
-        server.expect(requestTo("https://api.github.com/repos/owner/repo/pulls?state=closed&per_page=100"))
+        server.expect(requestTo("https://api.github.com/repos/owner/repo/pulls?state=closed&per_page=100&page=1"))
                 .andRespond(withSuccess(responseJson, MediaType.APPLICATION_JSON));
 
         List<Change> changes = adapter.fetchChanges(repoUrl, Instant.parse("2023-01-01T00:00:00Z"));

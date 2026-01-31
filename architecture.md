@@ -59,6 +59,13 @@ classDiagram
         class LeadTimeCalculator {
             +calculate(List~Change~ changes, List~Deployment~ deployments) Duration
         }
+        class MatchStrategy {
+            <<interface>>
+            +findDeployment(Change change, List~Deployment~ deployments) Optional~Deployment~
+        }
+        class ExactMatchStrategy
+        class ReleaseBodyStrategy
+        class TimeWindowStrategy
     }
 
     SourceControlPort ..> Deployment : produces
@@ -67,6 +74,10 @@ classDiagram
     
     LeadTimeCalculator ..> Change : uses
     LeadTimeCalculator ..> Deployment : uses
+    LeadTimeCalculator --> MatchStrategy : uses (Chain of Responsibility)
+    MatchStrategy <|-- ExactMatchStrategy
+    MatchStrategy <|-- ReleaseBodyStrategy
+    MatchStrategy <|-- TimeWindowStrategy
 ```
 
 ## Core Flow: Calculate Metrics
@@ -78,6 +89,7 @@ sequenceDiagram
     participant GitHub as SourceControlPort
     participant DB as MetricsRepositoryPort
     participant Calc as LeadTimeCalculator
+    participant Strat as MatchStrategy
 
     Web->>Service: calculateMetrics(repoUrl, timeWindow)
     activate Service
@@ -97,6 +109,10 @@ sequenceDiagram
 
     Service->>Calc: calculate(changes, deployments)
     activate Calc
+    loop For each Change
+        Calc->>Strat: findDeployment(change, deployments)
+        Strat-->>Calc: Optional<Deployment>
+    end
     Calc-->>Service: Duration (Lead Time)
     deactivate Calc
 

@@ -36,6 +36,18 @@ public class DoraMetricsService {
         List<Change> changes = sourceControlPort.fetchChanges(repoUrl, timeWindow.start());
         List<Incident> incidents = sourceControlPort.fetchIncidents(repoUrl, timeWindow.start());
 
+        System.out.println("DEBUG: Fetched " + deployments.size() + " deployments");
+        deployments.forEach(d -> {
+            String bodySnippet = d.description() != null ? d.description().substring(0, Math.min(d.description().length(), 50)).replace("\n", " ") : "null";
+            System.out.println("DEBUG: Deployment: " + d.id() + " at " + d.deployedAt() + " Body: " + bodySnippet + "...");
+        });
+
+        System.out.println("DEBUG: Fetched " + changes.size() + " changes");
+        if (!changes.isEmpty()) {
+            System.out.println("DEBUG: Newest Change: " + changes.get(0).id() + " mergedAt: " + changes.get(0).mergedAt());
+            System.out.println("DEBUG: Oldest Change: " + changes.get(changes.size() - 1).id() + " mergedAt: " + changes.get(changes.size() - 1).mergedAt());
+        }
+
         // 2. Persist (Optional for MVP, but good practice)
         metricsRepositoryPort.saveDeployments(deployments);
         metricsRepositoryPort.saveChanges(changes);
@@ -43,6 +55,7 @@ public class DoraMetricsService {
 
         // 3. Calculate Lead Time
         Duration leadTime = leadTimeCalculator.calculate(changes, deployments);
+        System.out.println("DEBUG: Calculated Lead Time: " + leadTime);
 
         // 4. Calculate Deployment Frequency
         // Logic: Total Deployments / Days in Window

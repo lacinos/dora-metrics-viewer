@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,30 +57,58 @@ public class GitHubAdapter implements SourceControlPort {
     @Override
     public List<Change> fetchChanges(String repoUrl, Instant since) {
         var repoPath = extractRepoPath(repoUrl);
-        List<GitHubPullRequestDTO> prs = restClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/repos/" + repoPath + "/pulls")
-                        .queryParam("state", "closed")
-                        .queryParam("per_page", 100)
-                        .build())
-                .retrieve()
-                .body(new ParameterizedTypeReference<>() {});
+        List<Change> allChanges = new ArrayList<>();
+        int page = 1;
+        // Fetch up to 8 pages (800 items) to cover enough history for busy repos like vscode
+        while (page <= 8) {
+            int currentPage = page;
+            List<GitHubPullRequestDTO> prs = restClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/repos/" + repoPath + "/pulls")
+                            .queryParam("state", "closed")
+                            .queryParam("per_page", 100)
+                            .queryParam("page", currentPage)
+                            .build())
+                    .retrieve()
+                    .body(new ParameterizedTypeReference<>() {});
 
-        if (prs == null) {
-            return Collections.emptyList();
+            if (prs == null || prs.isEmpty()) {
+                break;
+            }
+
+            List<Change> pageChanges = prs.stream()
+                    .filter(pr -> pr.mergedAt() != null && pr.mergedAt().isAfter(since))
+                    .map(pr -> new Change(
+                            repoPath + "/pr/" + pr.number(),
+                            repoUrl,
+                            pr.mergeCommitSha(),
+                            pr.createdAt(),
+                            pr.mergedAt(),
+                            pr.user() != null ? pr.user().login() : "unknown"
+                    ))
+                    .collect(Collectors.toList());
+            
+            allChanges.addAll(pageChanges);
+            
+            // If the last PR in the page is older than 'since', we can stop.
+            // Note: This relies on the API returning roughly roughly reverse chronological order.
+            // We check the mergedAt of the last item if it exists.
+            if (!prs.isEmpty()) {
+                GitHubPullRequestDTO lastPr = prs.get(prs.size() - 1);
+                if (lastPr.mergedAt() != null && lastPr.mergedAt().isBefore(since)) {
+                    break;
+                }
+                // If created_at is significantly before since, we might also stop, 
+                // but mergedAt is the source of truth for the filter.
+            }
+
+            if (prs.size() < 100) {
+                break;
+            }
+            page++;
         }
 
-        return prs.stream()
-                .filter(pr -> pr.mergedAt() != null && pr.mergedAt().isAfter(since))
-                .map(pr -> new Change(
-                        repoPath + "/pr/" + pr.number(),
-                        repoUrl,
-                        pr.mergeCommitSha(),
-                        pr.createdAt(),
-                        pr.mergedAt(),
-                        pr.user() != null ? pr.user().login() : "unknown"
-                ))
-                .collect(Collectors.toList());
+        return allChanges;
     }
 
     @Override
