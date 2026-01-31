@@ -39,6 +39,14 @@ public class MetricsRepositoryAdapter implements MetricsRepositoryPort {
     }
 
     @Override
+    public List<Deployment> findDeployments(String repoUrl, Instant start, Instant end) {
+        return deploymentRepository.findByRepositoryUrlAndDeployedAtBetween(repoUrl, start, end)
+            .stream()
+            .map(mapper::toDomain)
+            .toList();
+    }
+
+    @Override
     public void saveChanges(List<Change> changes) {
         changeRepository.saveAll(changes.stream()
             .map(mapper::toEntity)
@@ -54,6 +62,14 @@ public class MetricsRepositoryAdapter implements MetricsRepositoryPort {
     }
 
     @Override
+    public List<Change> findChanges(String repoUrl, Instant start, Instant end) {
+        return changeRepository.findByRepositoryUrlAndMergedAtBetween(repoUrl, start, end)
+            .stream()
+            .map(mapper::toDomain)
+            .toList();
+    }
+
+    @Override
     public void saveIncidents(List<Incident> incidents) {
         incidentRepository.saveAll(incidents.stream()
             .map(mapper::toEntity)
@@ -63,6 +79,14 @@ public class MetricsRepositoryAdapter implements MetricsRepositoryPort {
     @Override
     public List<Incident> findIncidents(String repoUrl, Instant since) {
         return incidentRepository.findByRepositoryUrlAndCreatedAtAfter(repoUrl, since)
+            .stream()
+            .map(mapper::toDomain)
+            .toList();
+    }
+
+    @Override
+    public List<Incident> findIncidents(String repoUrl, Instant start, Instant end) {
+        return incidentRepository.findByRepositoryUrlAndCreatedAtBetween(repoUrl, start, end)
             .stream()
             .map(mapper::toDomain)
             .toList();

@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface SpringDataChangeRepository extends JpaRepository<JpaChangeEntity, String> {
     List<JpaChangeEntity> findByRepositoryUrlAndMergedAtAfter(String repositoryUrl, Instant since);
+    List<JpaChangeEntity> findByRepositoryUrlAndMergedAtBetween(String repositoryUrl, Instant start, Instant end);
 }

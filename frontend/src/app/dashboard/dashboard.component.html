@@ -6,26 +6,57 @@
       <p class="text-gray-600 mt-2">Analyze your repository performance</p>
     </header>
 
-    <!-- Search Bar -->
+    <!-- Search Bar & Controls -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-      <div class="flex gap-4">
-        <input 
-          type="text" 
-          [ngModel]="repoUrl()" 
-          (ngModelChange)="repoUrl.set($event)"
-          placeholder="Enter GitHub Repository URL (e.g., https://github.com/owner/repo)" 
-          class="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          [disabled]="isLoading()"
-        />
-        <button 
-          (click)="onScan()" 
-          [disabled]="isLoading() || !repoUrl()"
-          class="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          <span *ngIf="isLoading()">Scanning...</span>
-          <span *ngIf="!isLoading()">Scan</span>
-        </button>
+      <div class="flex flex-col gap-4">
+        <!-- Repository URL Input -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Repository URL</label>
+          <input 
+            type="text" 
+            [ngModel]="repoUrl()" 
+            (ngModelChange)="repoUrl.set($event)"
+            placeholder="Enter GitHub Repository URL (e.g., https://github.com/owner/repo)" 
+            class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [disabled]="isLoading()"
+          />
+        </div>
+
+        <!-- Date Range & Action -->
+        <div class="flex flex-wrap gap-4 items-end">
+          <div class="flex-1 min-w-[200px]">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+            <input 
+              type="date" 
+              [ngModel]="startDate()" 
+              (ngModelChange)="startDate.set($event)"
+              class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              [disabled]="isLoading()"
+            />
+          </div>
+          
+          <div class="flex-1 min-w-[200px]">
+            <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+            <input 
+              type="date" 
+              [ngModel]="endDate()" 
+              (ngModelChange)="endDate.set($event)"
+              class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              [disabled]="isLoading()"
+            />
+          </div>
+
+          <button 
+            (click)="onScan()" 
+            [disabled]="isLoading() || !repoUrl()"
+            class="flex-none px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors h-[50px]"
+          >
+            <span *ngIf="isLoading()">Scanning...</span>
+            <span *ngIf="!isLoading()">Analyze Metrics</span>
+          </button>
+        </div>
       </div>
+      
       <div *ngIf="error()" class="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">
         {{ error() }}
       </div>

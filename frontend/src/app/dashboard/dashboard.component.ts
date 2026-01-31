@@ -17,6 +17,9 @@ export class DashboardComponent {
   private apiService = inject(ApiService);
 
   repoUrl = signal<string>('');
+  startDate = signal<string>(this.getDefaultStartDate());
+  endDate = signal<string>(this.getDefaultEndDate());
+  
   isLoading = signal<boolean>(false);
   error = signal<string | null>(null);
   metrics = signal<DoraMetricsResult | null>(null);
@@ -49,6 +52,16 @@ export class DashboardComponent {
     group: ScaleType.Ordinal,
     domain: ['#f59e0b']
   };
+
+  private getDefaultStartDate(): string {
+    const d = new Date();
+    d.setDate(d.getDate() - 30);
+    return d.toISOString().split('T')[0];
+  }
+
+  private getDefaultEndDate(): string {
+    return new Date().toISOString().split('T')[0];
+  }
 
   private parseDuration(ptString: string): number {
     if (!ptString || !ptString.startsWith('PT')) return 0;
@@ -115,10 +128,8 @@ export class DashboardComponent {
     this.error.set(null);
     this.metrics.set(null);
 
-    // Using 30 days default to ensure we capture enough deployments
-    const end = new Date();
-    const start = new Date();
-    start.setDate(start.getDate() - 30); 
+    const start = new Date(this.startDate());
+    const end = new Date(this.endDate() + 'T23:59:59'); // Include the full end day
     
     const timeWindow: TimeWindow = {
       start: start.toISOString(),

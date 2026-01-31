@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface SpringDataIncidentRepository extends JpaRepository<JpaIncidentEntity, String> {
     List<JpaIncidentEntity> findByRepositoryUrlAndCreatedAtAfter(String repositoryUrl, Instant since);
+    List<JpaIncidentEntity> findByRepositoryUrlAndCreatedAtBetween(String repositoryUrl, Instant start, Instant end);
 }
