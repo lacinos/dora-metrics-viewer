@@ -115,14 +115,10 @@ export class DashboardComponent {
     this.error.set(null);
     this.metrics.set(null);
 
-    // Using 7 days for the "Golden Dataset" alignment, but default to 30 is fine.
-    // The Golden Dataset logic in backend simply returns a fixed list regardless of window,
-    // but we need to ensure the "days in window" calculation in service aligns with our expectation.
-    // If I send 30 days window, the 2 deployments will result in 2/30 = 0.06/day.
-    // If I send 7 days, it's 2/7 = 0.28/day.
+    // Using 30 days default to ensure we capture enough deployments
     const end = new Date();
     const start = new Date();
-    start.setDate(start.getDate() - 7); 
+    start.setDate(start.getDate() - 30); 
     
     const timeWindow: TimeWindow = {
       start: start.toISOString(),
