@@ -31,18 +31,29 @@ public class DoraMetricsService {
     }
 
     public DoraMetricsResult calculateMetrics(String repoUrl, TimeWindow timeWindow) {
-        // 1. Fetch all raw data
+        // 1. Fetch all raw data starting from the window start
         List<Deployment> deployments = sourceControlPort.fetchDeployments(repoUrl, timeWindow.start());
         List<Change> changes = sourceControlPort.fetchChanges(repoUrl, timeWindow.start());
         List<Incident> incidents = sourceControlPort.fetchIncidents(repoUrl, timeWindow.start());
 
-        System.out.println("DEBUG: Fetched " + deployments.size() + " deployments");
+        // Filter data to exclude items after the window end
+        deployments = deployments.stream()
+                .filter(d -> !d.deployedAt().isAfter(timeWindow.end()))
+                .toList();
+        changes = changes.stream()
+                .filter(c -> !c.mergedAt().isAfter(timeWindow.end()))
+                .toList();
+        incidents = incidents.stream()
+                .filter(i -> !i.createdAt().isAfter(timeWindow.end()))
+                .toList();
+
+        System.out.println("DEBUG: Fetched " + deployments.size() + " deployments (in window)");
         deployments.forEach(d -> {
             String bodySnippet = d.description() != null ? d.description().substring(0, Math.min(d.description().length(), 50)).replace("\n", " ") : "null";
             System.out.println("DEBUG: Deployment: " + d.id() + " at " + d.deployedAt() + " Body: " + bodySnippet + "...");
         });
 
-        System.out.println("DEBUG: Fetched " + changes.size() + " changes");
+        System.out.println("DEBUG: Fetched " + changes.size() + " changes (in window)");
         if (!changes.isEmpty()) {
             System.out.println("DEBUG: Newest Change: " + changes.get(0).id() + " mergedAt: " + changes.get(0).mergedAt());
             System.out.println("DEBUG: Oldest Change: " + changes.get(changes.size() - 1).id() + " mergedAt: " + changes.get(changes.size() - 1).mergedAt());
@@ -51,7 +62,7 @@ public class DoraMetricsService {
         // 2. Persist (Optional for MVP, but good practice)
         metricsRepositoryPort.saveDeployments(deployments);
         metricsRepositoryPort.saveChanges(changes);
-        // metricsRepositoryPort.saveIncidents(incidents); // Method missing in interface, skipping for now
+        metricsRepositoryPort.saveIncidents(incidents);
 
         // 3. Calculate Lead Time
         Duration leadTime = leadTimeCalculator.calculate(changes, deployments);

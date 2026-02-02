@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface SpringDataDeploymentRepository extends JpaRepository<JpaDeploymentEntity, String> {
     List<JpaDeploymentEntity> findByRepositoryUrlAndDeployedAtAfter(String repositoryUrl, Instant since);
+    List<JpaDeploymentEntity> findByRepositoryUrlAndDeployedAtBetween(String repositoryUrl, Instant start, Instant end);
 }

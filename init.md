@@ -1,0 +1,1 @@
+we are working on a procet described in @README.md and @gemini.md files. It was implemented with this @plan.md and with this architecture guidelines @architecture.md
