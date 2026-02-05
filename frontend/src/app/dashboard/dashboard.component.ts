@@ -75,7 +75,12 @@ export class DashboardComponent {
   // Chart Data Signals
   leadTimeData = computed(() => {
     const m = this.metrics();
-    if (!m) return [];
+    if (!m) return [
+      {
+        name: 'Lead Time (Hours)',
+        value: 0
+      }
+    ];
     
     return [
       {
@@ -114,7 +119,9 @@ export class DashboardComponent {
 
   timeToRestoreData = computed(() => {
     const m = this.metrics();
-    if (!m) return [];
+    if (!m) return [
+       { name: 'MTTR (Hours)', value: 0 }
+    ];
 
      return [
        { name: 'MTTR (Hours)', value: this.parseDuration(m.timeToRestoreService) }
