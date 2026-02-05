@@ -1,9 +1,10 @@
 # JDK Downgrade/Verification Plan (Target: JDK 21)
 
 ## Current Status Observation
-- **`backend/pom.xml`**: `<java.version>` is already set to `21`.
+- **`backend/pom.xml`**: `<java.version>` is set to `21`.
 - **`README.md`**: States `Java: 21`.
-- **Conclusion**: The project configuration appears to already be targeting JDK 21. The "downgrade" might have already happened or the project never moved to 25.
+- **System Java**: `openjdk version "21.0.9"` verified.
+- **Verification Status**: **PASSED** (2026-02-05)
 
 ## Objective
 Ensure the project is fully compatible with JDK 21 and remove any accidental dependencies on JDK 25 features or configuration artifacts if they exist.
@@ -16,23 +17,23 @@ Ensure the project is fully compatible with JDK 21 and remove any accidental dep
 
 ## Migration/Verification Steps
 
-1.  **Verify Configuration (Already Done - Passed)**
+1.  **Verify Configuration (Done)**
     - `backend/pom.xml` sets `<java.version>21</java.version>`.
-    - Compiler plugin release/source/target should be derived from this property.
+    - Compiler plugin release/source/target derived from this property.
 
-2.  **Verify Source Code Compatibility**
-    - **Action:** Run a clean build using a strict JDK 21 environment if possible, or ensure the Maven compiler plugin is enforcing `--release 21`.
-    - **Command:** `./mvnw clean verify` (This will compile and run tests).
-    - **Check:** Look for any "invalid source release" or "cannot find symbol" errors that would indicate usage of post-21 APIs.
+2.  **Verify Source Code Compatibility (Done)**
+    - **Action:** Run a clean build using a strict JDK 21 environment.
+    - **Command:** `./mvnw clean verify`
+    - **Result:** BUILD SUCCESS. No "invalid source release" or "cannot find symbol" errors.
 
-3.  **Dependency Check**
-    - Ensure all dependencies (Spring Boot 3.4.1, etc.) are compatible with Java 21. (Spring Boot 3.4.x supports Java 17-23, so 21 is fully supported).
+3.  **Dependency Check (Done)**
+    - Dependencies (Spring Boot 3.4.1) are compatible with Java 21.
 
-4.  **Documentation**
-    - `README.md` is already correct.
-    - `feature_jdk_downgrade.md`: This file serves as the record of this check.
+4.  **Documentation (Done)**
+    - `README.md` is correct.
+    - `feature_jdk_downgrade.md`: Updated with verification results.
 
 ## Execution Plan
-1.  Run `./mvnw clean verify` in the `backend` directory.
-2.  If build passes, the project is successfully confirmed as JDK 21 compliant.
-3.  If build fails, analyze errors to identify JDK 25isms and refactor.
+1.  Run `./mvnw clean verify` in the `backend` directory. -> **DONE**
+2.  If build passes, the project is successfully confirmed as JDK 21 compliant. -> **CONFIRMED**
+3.  If build fails, analyze errors to identify JDK 25isms and refactor. -> **N/A**
