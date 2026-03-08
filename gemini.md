@@ -89,41 +89,23 @@ The system maps GitHub concepts to DORA entities as follows:
 - **UI Debugging:** If I report a layout issue, use the browser to inspect the page structure.
 - **Evidence:** Take a screenshot to prove a feature works.
 
-### Workflow: "The Visual Check"
-1.  **Ensure Server is Running:** Ask to confirm `ng serve` or `Spring Boot` are ready.
-2.  **Navigate:** Use `browser_navigate(url="http://localhost:4200")`.
-3.  **Inspect First:**
-    * Use `browser_snapshot` to read the accessibility tree (text, buttons, inputs) and find the correct names/roles.
-    * *Tip:* Do not guess selectors. Use the names returned in the snapshot (e.g., "Button 'Save'").
-4.  **Interact:**
-    * **Click:** `browser_click(element="Button 'Save'")` (Uses the label from the snapshot).
-    * **Type:** `browser_type(element="Textbox 'Username'", text="testuser")`.
-    * **Hover:** `browser_hover(element="Link 'Profile'")`.
-5.  **Validate:**
-    * **Visual Proof:** Use `browser_screenshot` to capture the final state.
-    * **Console Errors (CRITICAL):** ALWAYS check for errors after interactions, especially for "silent" failures or blank screens.
+### The "Snapshot-First" Workflow
+1.  **Navigate:** `browser_navigate(url="http://localhost:4200")`
+2.  **Snapshot (Mandatory):** Call `browser_snapshot` immediately after navigation.
+    * *Result:* You will receive a text tree of the page.
+    * *Action:* Find the element you want (e.g., "Button 'Save'"). **Copy its `ref` ID** (e.g., `e12`, `e45`).
+3.  **Interact (Using IDs):**
+    * **Click:** `browser_click(element="Save Button", ref="e12")`
+        * *Note:* `element` is just a label for you. `ref` is the REQUIRED target ID.
+    * **Type:** `browser_type(element="Username Input", ref="e45", text="admin")`
+4.  **Verify:**
+    * **Visual:** `browser_screenshot` (for your final proof).
+    * **Logs:** Call `browser_console_messages` (with **NO arguments**) to check for errors.
 
-### Advanced Verification & Debugging (The "Click & Listen" Pattern)
-**To catch runtime errors like NullPointerExceptions in the browser:**
-
-1.  **Interact first:** Perform the action that might trigger the error.
-    *   *Example:* `browser_click(element="Pie Chart Slice 'Success'")`
-2.  **Capture immediately:** Use `browser_console_messages` right after the interaction to see what happened.
-    *   *Command:* `browser_console_messages(level="error")`
-    *   *Why:* This tool returns the log buffer. If you don't check it, you miss the stack trace.
-3.  **Analyze:** If you see an error (e.g., `NullInjectorError`), use that stack trace to find the root cause in the code.
-
-### Handling SVGs & Charts (e.g., ngx-charts)
-SVG libraries often mask standard accessibility roles.
--   **Strategy:** If `browser_click` on the container fails, try to target specific text or `path` elements inside the chart.
--   **Example:** To click the green circle in a chart:
-    *   *Try:* `browser_click(element="text='Success'")` (if the legend has text)
-    *   *Fallback:* Use `browser_run_code` to force a click on the DOM element:
-        ```javascript
-        async (page) => {
-            await page.locator('ngx-charts-pie-chart .circle').first().click({ force: true });
-        }
-        ```
+### Troubleshooting Rules
+* **"Error: Element not found":** This means your `ref` ID is stale. **Do not guess a new ID.** Run `browser_snapshot` again to get the new `ref`.
+* **Console Errors:** If `browser_console_messages` fails, use `browser_evaluate(expression="console.error")` instead.
+* **Ref IDs:** They look like `e23`, `e91`. They change every time the page updates.
 
 ### Safety & Best Practices
 - **Localhost Only:** Do not visit external URLs unless explicitly requested.
