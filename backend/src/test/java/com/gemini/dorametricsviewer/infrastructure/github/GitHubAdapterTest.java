@@ -6,14 +6,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestClientException;
 
 import java.time.Instant;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @RestClientTest(GitHubAdapter.class)
@@ -25,6 +29,10 @@ class GitHubAdapterTest {
 
     @Autowired
     private MockRestServiceServer server;
+
+    // -------------------------------------------------------------------------
+    // Happy-path tests (original)
+    // -------------------------------------------------------------------------
 
     @Test
     void fetchDeployments_shouldReturnDeployments() {
@@ -82,5 +90,78 @@ class GitHubAdapterTest {
         assertThat(c.id()).isEqualTo("owner/repo/pr/42");
         assertThat(c.commitSha()).isEqualTo("sha456");
         assertThat(c.author()).isEqualTo("dev1");
+    }
+
+    // -------------------------------------------------------------------------
+    // Error-path tests
+    // -------------------------------------------------------------------------
+
+    @Test
+    void fetchDeployments_shouldThrowException_whenUnauthorized() {
+        String repoUrl = "https://github.com/owner/repo";
+
+        server.expect(requestTo("https://api.github.com/repos/owner/repo/releases"))
+                .andRespond(withStatus(HttpStatus.UNAUTHORIZED));
+
+        assertThatThrownBy(() -> adapter.fetchDeployments(repoUrl, Instant.parse("2023-01-01T00:00:00Z")))
+                .isInstanceOf(RestClientException.class);
+    }
+
+    @Test
+    void fetchDeployments_shouldThrowException_whenRepositoryNotFound() {
+        String repoUrl = "https://github.com/owner/nonexistent";
+
+        server.expect(requestTo("https://api.github.com/repos/owner/nonexistent/releases"))
+                .andRespond(withStatus(HttpStatus.NOT_FOUND));
+
+        assertThatThrownBy(() -> adapter.fetchDeployments(repoUrl, Instant.parse("2023-01-01T00:00:00Z")))
+                .isInstanceOf(RestClientException.class);
+    }
+
+    @Test
+    void fetchDeployments_shouldThrowException_whenRateLimited() {
+        String repoUrl = "https://github.com/owner/repo";
+
+        server.expect(requestTo("https://api.github.com/repos/owner/repo/releases"))
+                .andRespond(withStatus(HttpStatus.FORBIDDEN));
+
+        assertThatThrownBy(() -> adapter.fetchDeployments(repoUrl, Instant.parse("2023-01-01T00:00:00Z")))
+                .isInstanceOf(RestClientException.class);
+    }
+
+    @Test
+    void fetchChanges_shouldExcludePullRequestsWithNullMergedAt() {
+        // Closed but unmerged PRs have merged_at: null and must be excluded from Changes.
+        String repoUrl = "https://github.com/owner/repo";
+        String responseJson = """
+            [
+                {
+                    "id": 2001,
+                    "number": 10,
+                    "merge_commit_sha": null,
+                    "created_at": "2023-10-01T08:00:00Z",
+                    "merged_at": null,
+                    "user": { "login": "dev-closed" },
+                    "html_url": "http://github.com/owner/repo/pull/10"
+                },
+                {
+                    "id": 2002,
+                    "number": 11,
+                    "merge_commit_sha": "sha-merged",
+                    "created_at": "2023-10-01T09:00:00Z",
+                    "merged_at": "2023-10-02T12:00:00Z",
+                    "user": { "login": "dev-merged" },
+                    "html_url": "http://github.com/owner/repo/pull/11"
+                }
+            ]
+            """;
+
+        server.expect(requestTo("https://api.github.com/repos/owner/repo/pulls?state=closed&per_page=100&page=1"))
+                .andRespond(withSuccess(responseJson, MediaType.APPLICATION_JSON));
+
+        List<Change> changes = adapter.fetchChanges(repoUrl, Instant.parse("2023-01-01T00:00:00Z"));
+
+        assertThat(changes).hasSize(1);
+        assertThat(changes.get(0).id()).isEqualTo("owner/repo/pr/11");
     }
 }
