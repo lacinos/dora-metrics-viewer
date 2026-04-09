@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from '../core/services/api.service';
+import { GraphqlApiService } from '../core/services/graphql-api.service';
 import { DoraMetricsResult, TimeWindow } from '../core/models/dora-metrics.model';
 import { NgxChartsModule, Color, ScaleType } from '@swimlane/ngx-charts';
 import { catchError, finalize, of, tap } from 'rxjs';
@@ -14,7 +14,7 @@ import { catchError, finalize, of, tap } from 'rxjs';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent {
-  private apiService = inject(ApiService);
+  private apiService = inject(GraphqlApiService);
 
   repoUrl = signal<string>('');
   startDate = signal<string>(this.getDefaultStartDate());

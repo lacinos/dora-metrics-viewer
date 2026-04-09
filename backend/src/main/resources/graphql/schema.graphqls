@@ -1,0 +1,19 @@
+type Query {
+  _placeholder: Boolean
+}
+
+type Mutation {
+  scanRepository(repoUrl: String!, timeWindow: TimeWindowInput!): DoraMetricsResult!
+}
+
+input TimeWindowInput {
+  start: String!
+  end: String!
+}
+
+type DoraMetricsResult {
+  leadTimeForChanges: String!
+  deploymentFrequency: Float!
+  changeFailureRate: Float!
+  timeToRestoreService: String!
+}
